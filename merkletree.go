@@ -29,7 +29,9 @@ func (t *MerkleTree) Root() []byte {
 // Build 根据交易哈希生成默克尔树
 func (t *MerkleTree) Build(txHashes [][]byte) {
 	// 1.对交易信息进行排序
-	sort.Sort(Slices(txHashes))
+	sort.Slice(txHashes, func(i, j int) bool {
+		return bytes.Compare(txHashes[i], txHashes[j]) == -1
+	})
 
 	// 2.判断是否是奇数份交易
 	if len(txHashes)%2 != 0 {
@@ -151,10 +153,3 @@ func Verify(txHash []byte, proof [][]byte, merkleRoot []byte) bool {
 	}
 	return bytes.Equal(dst, merkleRoot)
 }
-
-// Slices 定义[][]byte排序的类型
-type Slices [][]byte
-
-func (s Slices) Len() int           { return len(s) }
-func (s Slices) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s Slices) Less(i, j int) bool { return bytes.Compare(s[i], s[j]) == -1 }
