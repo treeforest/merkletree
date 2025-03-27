@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: ["1.23"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go ${{ matrix.go }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+          check-latest: true
+
+      - name: Check go.mod
+        run: |
+          if [ ! -f go.mod ]; then
+            echo "错误：未找到 go.mod 文件"
+            exit 1
+          fi
+
+      - name: Run Tests
+        run: |
+          go test -v -race -shuffle=on -coverprofile=coverage.out -covermode=atomic ./...
+          go tool cover -func=coverage.out
+
+      - name: Run Benchmarks
+        run: |
+          go test -bench=. -benchmem -run=^$ ./...

@@ -1,0 +1,23 @@
+version: "2"
+
+linters:
+  default: fast
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    # 新增检查
+    - gocyclo
+    - gocritic
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+    - golines
+
+run:
+  timeout: 5m
+  concurrency: 2
